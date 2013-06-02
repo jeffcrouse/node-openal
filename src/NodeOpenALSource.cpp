@@ -40,8 +40,8 @@ void NodeOpenALSource::Init(Handle<Object> exports) {
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   tpl->PrototypeTemplate()->Set(String::NewSymbol("Play"), FunctionTemplate::New(Play)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("SetPosition"), FunctionTemplate::New(Play)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("SetLoop"), FunctionTemplate::New(Play)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("SetPosition"), FunctionTemplate::New(SetPosition)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("SetLoop"), FunctionTemplate::New(SetLoop)->GetFunction());
 
   Persistent<Function> constructor = Persistent<Function>::New(tpl->GetFunction());
   exports->Set(String::NewSymbol("Source"), constructor);

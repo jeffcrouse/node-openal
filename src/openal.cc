@@ -15,12 +15,50 @@
 #include "NodeOpenALDevice.h"
 #include "NodeOpenALContext.h"
 #include "NodeOpenALSource.h"
-
+#include "NodeOpenALMPStream.h"
 
 using namespace v8;
 using namespace std;
 
+void PrintOpenALInfo()
+{
+	if (alGetString(AL_VERSION))
+		cout << "OpenAL version: "    << alGetString(AL_VERSION)    << endl;
+	if (alGetString(AL_RENDERER))
+		cout << "OpenAL renderer: "   << alGetString(AL_RENDERER)   << endl;
+	if (alGetString(AL_VENDOR))
+		cout << "OpenAL vendor: "     << alGetString(AL_VENDOR)     << endl;
+	if (alGetString(AL_EXTENSIONS))
+		cout << "OpenAL extensions: " << alGetString(AL_EXTENSIONS) << endl;
 
+	// Enumerate OpenAL devices
+	if (alcIsExtensionPresent (NULL, (const ALCchar *) "ALC_ENUMERATION_EXT") == AL_TRUE)
+	{
+		const char *s = (const char *) alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+		while (*s != '\0')
+		{
+			cout << "OpenAL available device: " << s << endl;
+			while (*s++ != '\0');
+		}
+	}
+	else
+	{
+		cout << "OpenAL device enumeration isn't available." << endl;
+	}
+
+	// Print default device name
+	cout << "OpenAL default device: "
+	     << (const char *)alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER)
+		 << endl;
+
+	// Print current device name
+	// if (myDevice)
+	// {
+	// 	cout << "OpenAL current device: "
+	// 		 << (const char *)alcGetString(myDevice, ALC_DEVICE_SPECIFIER)
+	// 		 << endl;
+	// }
+}
 
 
 
@@ -68,11 +106,14 @@ Handle<Value> MakeContextCurrent(const Arguments& args) {
 
 // --------------------------------------------------
 void Init(Handle<Object> exports) {
+	PrintOpenALInfo();
+	
 	NodeWavData::Init(exports);
 	NodeOpenALContext::Init(exports);
 	NodeOpenALDevice::Init(exports);
 	NodeOpenALSource::Init(exports);
-
+	NodeOpenALMPStream::Init(exports);
+	
 	exports->Set( String::NewSymbol("MakeContextCurrent"), FunctionTemplate::New(MakeContextCurrent)->GetFunction() );
 	exports->Set( String::NewSymbol("SetListenerPosition"), FunctionTemplate::New(SetListenerPosition)->GetFunction() );
 	exports->Set( String::NewSymbol("SetListenerOrientation"), FunctionTemplate::New(SetListenerOrientation)->GetFunction() );

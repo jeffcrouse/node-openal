@@ -2,7 +2,14 @@
   'targets': [
     {
       'target_name': 'openal',
-      'sources': [ 'src/openal.cc', "src/NodeWavData.cpp", "src/NodeOpenALDevice.cpp", "src/NodeOpenALContext.cpp", "src/NodeOpenALSource.cpp"],
+      'sources': [ 
+        "src/openal.cc", 
+        "src/NodeWavData.cpp", 
+        "src/NodeOpenALDevice.cpp", 
+        "src/NodeOpenALContext.cpp", 
+        "src/NodeOpenALSource.cpp",
+        "src/NodeOpenALMPStream.cpp"
+        ],
       'conditions': [
         ['OS=="linux"',
           {
