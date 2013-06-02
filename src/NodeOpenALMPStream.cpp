@@ -14,7 +14,7 @@ void NodeOpenALMPStream::Init(Handle<Object> exports) {
 	tpl->SetClassName(String::NewSymbol("Stream"));
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-	//tpl->PrototypeTemplate()->Set(String::NewSymbol("Play"), FunctionTemplate::New(Play)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("Ready"), FunctionTemplate::New(Ready)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("Buffer"), FunctionTemplate::New(Buffer)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("SetPosition"), FunctionTemplate::New(SetPosition)->GetFunction());
 
@@ -39,7 +39,6 @@ Handle<Value> NodeOpenALMPStream::Buffer(const Arguments& args) {
 
 	Local<Value> buffer = args[0];
 	size_t size = node::Buffer::Length( buffer->ToObject() );
-	cout << "got " << size << " bytes" << endl;
 	char* bufferdata = node::Buffer::Data( buffer->ToObject() );
 
 	obj->buffer(size, bufferdata);
@@ -48,12 +47,13 @@ Handle<Value> NodeOpenALMPStream::Buffer(const Arguments& args) {
 
 
 // --------------------------------------------------------
-// Handle<Value> NodeOpenALMPStream::Play(const Arguments& args) {
-// 	HandleScope scope;
-// 	NodeOpenALMPStream* obj = ObjectWrap::Unwrap<NodeOpenALMPStream>(args.This());
-// 	obj->play();
-// 	return scope.Close(v8::Undefined());
-// }
+Handle<Value> NodeOpenALMPStream::Ready(const Arguments& args) {
+	HandleScope scope;
+	NodeOpenALMPStream* obj = ObjectWrap::Unwrap<NodeOpenALMPStream>(args.This());
+
+
+	return scope.Close(Boolean::New( obj->ready() ));
+}
 
 // --------------------------------------------------------
 Handle<Value> NodeOpenALMPStream::SetPosition(const Arguments& args) {
@@ -101,6 +101,7 @@ NodeOpenALMPStream::NodeOpenALMPStream() {
 	/* Generate the buffers and sources */
 	alGenBuffers(NUM_BUFFERS, buffers);
 	alGenSources(1, &sourceid);
+
 	ALenum error = alGetError();
 	if(error != AL_NO_ERROR) {
 		cout << "Error generating :( " << ErrorCheck(error) << endl;;
@@ -109,6 +110,7 @@ NodeOpenALMPStream::NodeOpenALMPStream() {
 	n = 0;
 	frequency = 44000;
 	format = AL_FORMAT_STEREO16;
+	alSource3f(sourceid, AL_POSITION, 0, 0, 0);
 }
 
 // -----------------------------------------------------
@@ -126,9 +128,6 @@ NodeOpenALMPStream::~NodeOpenALMPStream() {
 
 // -----------------------------------------------------
 void NodeOpenALMPStream::buffer(size_t size, char* data) {
-	// std::cout << "got " << size << " bytes" << std::endl;
-	// cout << "buffer " << n << endl;
-
 	// Prefill all of the buffers
 	if(n < NUM_BUFFERS-1) {
 		alBufferData(buffers[n], format, data, size, frequency);
@@ -143,7 +142,6 @@ void NodeOpenALMPStream::buffer(size_t size, char* data) {
 			alSourceQueueBuffers(sourceid, NUM_BUFFERS, buffers);
 			alSourcePlay(sourceid);
 		}
-
 	} else {
 
 		ALuint buffer;
@@ -172,14 +170,16 @@ void NodeOpenALMPStream::buffer(size_t size, char* data) {
 		if(val != AL_PLAYING)
 			alSourcePlay(sourceid);
 	}
-
-	
 }
 
-// // -----------------------------------------------------
-// void NodeOpenALMPStream::play() {
+// -----------------------------------------------------
+bool NodeOpenALMPStream::ready() {
+	if(n < NUM_BUFFERS-1) return true;
 
-// }
+	ALint val;
+	alGetSourcei(sourceid, AL_BUFFERS_PROCESSED, &val);
+	return (val >0);
+}
 
 // --------------------------------------------------------
 void NodeOpenALMPStream::setPosition(double x, double y, double z) {

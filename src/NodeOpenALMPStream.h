@@ -31,7 +31,7 @@ class NodeOpenALMPStream : public node::ObjectWrap {
         void buffer(size_t size, char* bufferdata);
         void setPosition(double x, double y, double z);
         void play();
-
+        bool ready();
 
 		/* These are what we'll use for OpenAL playback */
 		ALuint sourceid, buffers[NUM_BUFFERS];
@@ -42,7 +42,7 @@ class NodeOpenALMPStream : public node::ObjectWrap {
     private:
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
         static v8::Handle<v8::Value> Buffer(const v8::Arguments& args);
-        static v8::Handle<v8::Value> Play(const v8::Arguments& args);
+        static v8::Handle<v8::Value> Ready(const v8::Arguments& args);
         static v8::Handle<v8::Value> SetPosition(const v8::Arguments& args);
 
 		NodeOpenALMPStream();
