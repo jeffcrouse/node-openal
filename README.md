@@ -19,3 +19,4 @@ I didn't know anything about OpenAL or creating c++ node "addons" before startin
 * [OpenAL-soft](http://kcat.strangesoft.net/openal.html) air absorption, occlusion, and environmental reverb
 * same as [EFX](http://connect.creativelabs.com/developer/Wiki/Introduction%20to%20EFX.aspx)?
 * [use MPlayer for compressed formats?](http://kcat.strangesoft.net/openal-tutorial.html) or [ogg](http://devmaster.net/posts/2895/openal-lesson-8-oggvorbis-streaming-using-the-source-queue)
+* ultimately, I want to be able to stream the audio that is generated.  Is [this article](http://pedromtavares.wordpress.com/2012/12/28/streaming-audio-on-the-web-with-nodejs/) relavant?

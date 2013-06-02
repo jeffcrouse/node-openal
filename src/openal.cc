@@ -15,7 +15,7 @@
 #include "NodeOpenALDevice.h"
 #include "NodeOpenALContext.h"
 #include "NodeOpenALSource.h"
-#include "NodeOpenALMPStream.h"
+#include "NodeOpenALStream.h"
 
 using namespace v8;
 using namespace std;
@@ -112,7 +112,7 @@ void Init(Handle<Object> exports) {
 	NodeOpenALContext::Init(exports);
 	NodeOpenALDevice::Init(exports);
 	NodeOpenALSource::Init(exports);
-	NodeOpenALMPStream::Init(exports);
+	NodeOpenALStream::Init(exports);
 	
 	exports->Set( String::NewSymbol("MakeContextCurrent"), FunctionTemplate::New(MakeContextCurrent)->GetFunction() );
 	exports->Set( String::NewSymbol("SetListenerPosition"), FunctionTemplate::New(SetListenerPosition)->GetFunction() );

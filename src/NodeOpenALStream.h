@@ -25,13 +25,14 @@ using namespace std;
 
 
 // http://kcat.strangesoft.net/openal-tutorial.html
-class NodeOpenALMPStream : public node::ObjectWrap {
+class NodeOpenALStream : public node::ObjectWrap {
     public:
         static void Init(v8::Handle<v8::Object> exports);
         void buffer(size_t size, char* bufferdata);
         void setPosition(double x, double y, double z);
         void play();
         bool ready();
+        void setGain(float g);
 
 		/* These are what we'll use for OpenAL playback */
 		ALuint sourceid, buffers[NUM_BUFFERS];
@@ -44,7 +45,8 @@ class NodeOpenALMPStream : public node::ObjectWrap {
         static v8::Handle<v8::Value> Buffer(const v8::Arguments& args);
         static v8::Handle<v8::Value> Ready(const v8::Arguments& args);
         static v8::Handle<v8::Value> SetPosition(const v8::Arguments& args);
+        static v8::Handle<v8::Value> SetGain(const v8::Arguments& args);
 
-		NodeOpenALMPStream();
-    	~NodeOpenALMPStream();
+		NodeOpenALStream();
+    	~NodeOpenALStream();
 };

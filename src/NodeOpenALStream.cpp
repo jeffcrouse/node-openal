@@ -1,6 +1,6 @@
 #include <node.h>
 #include <node_buffer.h>
-#include "NodeOpenALMPStream.h"
+#include "NodeOpenALStream.h"
 
 using namespace v8;
 using namespace std;
@@ -8,7 +8,7 @@ using namespace std;
 struct stat statbuf;
 
 // --------------------------------------------------------
-void NodeOpenALMPStream::Init(Handle<Object> exports) {
+void NodeOpenALStream::Init(Handle<Object> exports) {
 	// Prepare constructor template
 	Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
 	tpl->SetClassName(String::NewSymbol("Stream"));
@@ -17,6 +17,7 @@ void NodeOpenALMPStream::Init(Handle<Object> exports) {
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("Ready"), FunctionTemplate::New(Ready)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("Buffer"), FunctionTemplate::New(Buffer)->GetFunction());
 	tpl->PrototypeTemplate()->Set(String::NewSymbol("SetPosition"), FunctionTemplate::New(SetPosition)->GetFunction());
+	tpl->PrototypeTemplate()->Set(String::NewSymbol("SetGain"), FunctionTemplate::New(SetGain)->GetFunction());
 
 	Persistent<Function> constructor = Persistent<Function>::New(tpl->GetFunction());
 	exports->Set(String::NewSymbol("Stream"), constructor);
@@ -24,18 +25,18 @@ void NodeOpenALMPStream::Init(Handle<Object> exports) {
 
 
 // --------------------------------------------------------
-Handle<Value> NodeOpenALMPStream::New(const Arguments& args) {
+Handle<Value> NodeOpenALStream::New(const Arguments& args) {
 	HandleScope scope;
-	NodeOpenALMPStream* stream = new NodeOpenALMPStream();
+	NodeOpenALStream* stream = new NodeOpenALStream();
 	stream->Wrap( args.This() );
 	return args.This();
 }
 
 
 // --------------------------------------------------------
-Handle<Value> NodeOpenALMPStream::Buffer(const Arguments& args) {
+Handle<Value> NodeOpenALStream::Buffer(const Arguments& args) {
 	HandleScope scope;
-	NodeOpenALMPStream* obj = ObjectWrap::Unwrap<NodeOpenALMPStream>(args.This());
+	NodeOpenALStream* obj = ObjectWrap::Unwrap<NodeOpenALStream>(args.This());
 
 	Local<Value> buffer = args[0];
 	size_t size = node::Buffer::Length( buffer->ToObject() );
@@ -47,23 +48,54 @@ Handle<Value> NodeOpenALMPStream::Buffer(const Arguments& args) {
 
 
 // --------------------------------------------------------
-Handle<Value> NodeOpenALMPStream::Ready(const Arguments& args) {
+Handle<Value> NodeOpenALStream::Ready(const Arguments& args) {
 	HandleScope scope;
-	NodeOpenALMPStream* obj = ObjectWrap::Unwrap<NodeOpenALMPStream>(args.This());
-
-
+	NodeOpenALStream* obj = ObjectWrap::Unwrap<NodeOpenALStream>(args.This());
 	return scope.Close(Boolean::New( obj->ready() ));
 }
 
 // --------------------------------------------------------
-Handle<Value> NodeOpenALMPStream::SetPosition(const Arguments& args) {
+Handle<Value> NodeOpenALStream::SetPosition(const Arguments& args) {
 	HandleScope scope;
-	NodeOpenALMPStream* obj = ObjectWrap::Unwrap<NodeOpenALMPStream>(args.This());
+	NodeOpenALStream* obj = ObjectWrap::Unwrap<NodeOpenALStream>(args.This());
+
+	if (args.Length() < 3) {
+		ThrowException(Exception::TypeError(String::New("Wrong number of arguments")));
+		return scope.Close( Undefined() );
+	}
+
+	if ( !args[0]->IsNumber() || !args[1]->IsNumber() || !args[2]->IsNumber()) {
+		ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+		return scope.Close( Undefined() );
+	}
 
 	double x = args[0]->NumberValue();
 	double y = args[1]->NumberValue();
 	double z = args[2]->NumberValue();
 	obj->setPosition(x, y, z);
+
+	return scope.Close(v8::Undefined());
+}
+
+
+// --------------------------------------------------------
+Handle<Value> NodeOpenALStream::SetGain(const Arguments& args) {
+	HandleScope scope;
+	NodeOpenALStream* obj = ObjectWrap::Unwrap<NodeOpenALStream>(args.This());
+
+	if (args.Length() < 1) {
+		ThrowException(Exception::TypeError(String::New("Wrong number of arguments")));
+		return scope.Close( Undefined() );
+	}
+
+	if ( !args[0]->IsNumber() ) {
+		ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+		return scope.Close( Undefined() );
+	}
+
+
+	double x = args[0]->NumberValue();
+	obj->setGain(x);
 
 	return scope.Close(v8::Undefined());
 }
@@ -97,7 +129,7 @@ string ErrorCheck(ALenum error)
 
 
 // -----------------------------------------------------
-NodeOpenALMPStream::NodeOpenALMPStream() {
+NodeOpenALStream::NodeOpenALStream() {
 	/* Generate the buffers and sources */
 	alGenBuffers(NUM_BUFFERS, buffers);
 	alGenSources(1, &sourceid);
@@ -114,7 +146,7 @@ NodeOpenALMPStream::NodeOpenALMPStream() {
 }
 
 // -----------------------------------------------------
-NodeOpenALMPStream::~NodeOpenALMPStream() {
+NodeOpenALStream::~NodeOpenALStream() {
 	ALint val;
 	/* Although mplayer is done giving us data, OpenAL may still be
 	 * playing the remaining buffers. Wait until it stops. */
@@ -127,7 +159,7 @@ NodeOpenALMPStream::~NodeOpenALMPStream() {
 }
 
 // -----------------------------------------------------
-void NodeOpenALMPStream::buffer(size_t size, char* data) {
+void NodeOpenALStream::buffer(size_t size, char* data) {
 	// Prefill all of the buffers
 	if(n < NUM_BUFFERS-1) {
 		alBufferData(buffers[n], format, data, size, frequency);
@@ -173,7 +205,7 @@ void NodeOpenALMPStream::buffer(size_t size, char* data) {
 }
 
 // -----------------------------------------------------
-bool NodeOpenALMPStream::ready() {
+bool NodeOpenALStream::ready() {
 	if(n < NUM_BUFFERS-1) return true;
 
 	ALint val;
@@ -181,8 +213,14 @@ bool NodeOpenALMPStream::ready() {
 	return (val >0);
 }
 
+// -----------------------------------------------------
+void NodeOpenALStream::setGain(float g) {
+	alSourcef(sourceid, AL_GAIN, g);
+}
+
 // --------------------------------------------------------
-void NodeOpenALMPStream::setPosition(double x, double y, double z) {
+void NodeOpenALStream::setPosition(double x, double y, double z) {
+	cout << "Position: " << x << ", " << y << ", " << z << endl;
 	alSource3f(sourceid, AL_POSITION, x, y, z);
 }
 

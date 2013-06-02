@@ -8,7 +8,7 @@
         "src/NodeOpenALDevice.cpp", 
         "src/NodeOpenALContext.cpp", 
         "src/NodeOpenALSource.cpp",
-        "src/NodeOpenALMPStream.cpp"
+        "src/NodeOpenALStream.cpp"
         ],
       'conditions': [
         ['OS=="linux"',

@@ -28,8 +28,8 @@ NodeOpenALSource::NodeOpenALSource(NodeWavData* data) {
 
 // --------------------------------------------------------
 NodeOpenALSource::~NodeOpenALSource() {
-	alDeleteSources(1,&sourceid);
-	alDeleteBuffers(1,&bufferid);
+	alDeleteSources(1, &sourceid);
+	alDeleteBuffers(1, &bufferid);
 };
 
 // --------------------------------------------------------
