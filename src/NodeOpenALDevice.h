@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <node.h>
 #include <v8.h>
 
@@ -19,8 +20,10 @@ using namespace std;
 
 class NodeOpenALDevice : public node::ObjectWrap {
 	public:
-		static void Init(v8::Handle<v8::Object> exports);
+		static void Init(Handle<Object> exports);
 		ALCdevice* device;
+
+		//static vector<NodeOpenALDevice*> devices;
 
 	private:
 		NodeOpenALDevice();

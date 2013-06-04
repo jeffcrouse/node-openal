@@ -28,6 +28,7 @@ using namespace std;
 class NodeOpenALStream : public node::ObjectWrap {
     public:
         static void Init(v8::Handle<v8::Object> exports);
+
         void buffer(size_t size, char* bufferdata);
         void setPosition(double x, double y, double z);
         void play();
@@ -40,13 +41,15 @@ class NodeOpenALStream : public node::ObjectWrap {
 		ALenum format;
 
 		int n;
+    
     private:
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
         static v8::Handle<v8::Value> Buffer(const v8::Arguments& args);
         static v8::Handle<v8::Value> Ready(const v8::Arguments& args);
         static v8::Handle<v8::Value> SetPosition(const v8::Arguments& args);
+        static v8::Handle<v8::Value> GetPosition(const Arguments& args);
         static v8::Handle<v8::Value> SetGain(const v8::Arguments& args);
 
-		NodeOpenALStream();
+		NodeOpenALStream(int channels, int bps, int _frequency);
     	~NodeOpenALStream();
 };

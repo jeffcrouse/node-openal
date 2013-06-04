@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <node.h>
 #ifdef __APPLE__
 	#include <OpenAL/al.h>
@@ -20,6 +21,7 @@ class NodeOpenALContext : public node::ObjectWrap {
 	public:
 		static void Init(v8::Handle<v8::Object> exports);
 		ALCcontext* context;
+		//static vector<NodeOpenALContext*> contexts;
 
 	private:
 		NodeOpenALContext(NodeOpenALDevice* dev);

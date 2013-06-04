@@ -5,7 +5,7 @@ using namespace v8;
 
 // --------------------------------------------------------
 NodeOpenALSource::NodeOpenALSource(NodeWavData* data) {
-    alGenBuffers(1, &bufferid);
+    
     if(data->channel==1) {
 		if(data->bps==8) {
 			format=AL_FORMAT_MONO8;
@@ -19,8 +19,9 @@ NodeOpenALSource::NodeOpenALSource(NodeWavData* data) {
 			format=AL_FORMAT_STEREO16;             
 		}      
     }
+
+    alGenBuffers(1, &bufferid);
     alBufferData(bufferid, format, data->data, data->size, data->samplerate);
-    
     alGenSources(1, &sourceid);
 	alSourcei(sourceid, AL_BUFFER, bufferid);
 	alSource3f(sourceid, AL_POSITION, 0, 0, 0);

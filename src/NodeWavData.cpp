@@ -75,9 +75,16 @@ Handle<Value> NodeWavData::New(const Arguments& args) {
 	if (args.Length() == 0 || !args[0]->IsString()) {
 		return ThrowException(v8::Exception::TypeError(v8::String::New("First argument must be a string")));
 	}
-	std::string path(*v8::String::AsciiValue(args[0]));
 
-	NodeWavData* wav = new NodeWavData( path.c_str()  );
+	char* path = *v8::String::AsciiValue(args[0]);
+
+	ifstream my_file(path);
+	if(!my_file.good()) {
+		return ThrowException(v8::Exception::TypeError(v8::String::New("File not found")));
+	}
+
+
+	NodeWavData* wav = new NodeWavData( path );
 	wav->Wrap( args.This() );
 	return args.This();
 }

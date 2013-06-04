@@ -3,6 +3,9 @@
 
 using namespace v8;
 
+//vector<NodeOpenALContext*> NodeOpenALContext::contexts;
+
+
 NodeOpenALContext::NodeOpenALContext(NodeOpenALDevice* dev) {
 	context = alcCreateContext(dev->device, NULL);
     if(context==NULL) {
@@ -13,8 +16,10 @@ NodeOpenALContext::NodeOpenALContext(NodeOpenALDevice* dev) {
 
 
 NodeOpenALContext::~NodeOpenALContext() {
-	if(context)
+	if(context) {
+		cout << "destroying context" << endl;
 		alcDestroyContext(context);
+	}
 };
 
 void NodeOpenALContext::Init(Handle<Object> exports) {
@@ -43,6 +48,8 @@ Handle<Value> NodeOpenALContext::New(const Arguments& args) {
 	NodeOpenALDevice* dev = node::ObjectWrap::Unwrap<NodeOpenALDevice>(args[0]->ToObject());
 	
 	NodeOpenALContext* ctx = new NodeOpenALContext( dev );
+	//contexts.push_back( ctx );
+
 	ctx->Wrap(args.This());
 
 	return args.This();

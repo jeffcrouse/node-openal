@@ -3,6 +3,8 @@
 
 using namespace v8;
 
+//vector<NodeOpenALDevice*> NodeOpenALDevice::devices;
+
 // ------------------------------------------
 NodeOpenALDevice::NodeOpenALDevice() {
 	device = alcOpenDevice(NULL);
@@ -14,8 +16,10 @@ NodeOpenALDevice::NodeOpenALDevice() {
 
 // ------------------------------------------
 NodeOpenALDevice::~NodeOpenALDevice() {
-	if(device)
+	if(device) {
+		cout << "destroying device" << endl;
 		alcCloseDevice(device);
+	}
 };
 
 // ------------------------------------------
@@ -34,8 +38,8 @@ Handle<Value> NodeOpenALDevice::New(const Arguments& args) {
 	HandleScope scope;
 
 	NodeOpenALDevice* obj = new NodeOpenALDevice();
-	//obj->counter_ = args[0]->IsUndefined() ? 0 : args[0]->NumberValue();
-	obj->Wrap(args.This());
+	//devices.push_back( obj );
+	obj->Wrap( args.This() );
 
 	return args.This();
 }
