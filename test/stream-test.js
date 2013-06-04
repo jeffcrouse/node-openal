@@ -1,5 +1,5 @@
 
-var openal = require('./build/Debug/openal')
+var openal = require('../openal')
 	, spawn = require('child_process').spawn
 	, util = require('util')
 
@@ -16,7 +16,7 @@ openal.SetListenerOrientation(1, 0, 0);
 
 
 var stream = new openal.Stream();
-var file = util.format("%s/sounds/Palisades.mp3", __dirname);
+var file = util.format("%s/../sounds/Palisades.mp3", __dirname);
 var args = ["-af", "resample=44100:0:1,channels=2,format=s16le",  
 			"-nogui", "-novideo", "-noconsolecontrols", "-really-quiet", 
 			"-ao", "pcm:nowaveheader:file=/dev/stdout", file];
@@ -34,13 +34,16 @@ mplayer.on('close', function (code) {
 	console.log('mplayer process exited with code ' + code);
 });
 
+
+
 var gain = 1;
 var x=0, y=0, z=0;
 setInterval(function(){
 	x+=0.2;
-	console.log(x);
-	stream.SetGain(gain);
 	gain *= 0.8;
+
+
+	stream.SetGain(gain);	
 	stream.SetPosition(-x, y, z);
 	openal.SetListenerPosition(x, y, z);
 	//synth.Play();
